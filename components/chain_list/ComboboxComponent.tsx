@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Chain, AssetList, Asset } from '@chain-registry/types';
 import { useState, useEffect, FC } from 'react';
-import { I_OptionComponentProps, I_ComboboxComponentProps} from '@/interface';
+import { I_OptionComponentProps, I_ComboboxComponentProps } from '@/interface';
 
 const Combobox = styled.div`
   position: relative;
@@ -10,35 +10,101 @@ const Combobox = styled.div`
   margin-top: 40px;
 `;
 
-const Input = styled.input`
-  padding: 10px; 
+const InputContainer = styled.div`    
+  position: relative;    
+  display: flex;    
+  align-items: center;    
   width: 100%;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  padding-left: ${props => props['data-has-selected-option'] ? 48 : 10}px;
+`;
 
-  &:focus {
-    outline: none; 
-    border-color: #1890ff;
-  }
+const Input = styled.div`  
+  position: relative;  
+  display: flex;  
+  align-items: center;  
+  flex: 1;
+  
+  & input {  
+    padding: 10px;   
+    width: 100%;  
+    border-radius: 4px;  
+    border: 1px solid #ccc;  
+    padding-left: ${props => props['data-has-selected-option'] ? 48 : 10}px;  
+    padding-right: 40px;
+  
+    &:focus {  
+      outline: none;   
+      border-color: #1890ff;  
+    }  
+  }  
+  
+  & button {  
+    position: absolute;  
+    right: 0;  
+    top: 50%;  
+    transform: translateY(-50%);  
+    background: none;  
+    border: none;  
+    padding: 0 10px;  
+    cursor: pointer;  
+    color: #999;  
+    font-size: 16px;  
+    line-height: 1;  
+  
+    &:hover {  
+      color: #333;  
+    }  
+  }  
+`;
+
+const DropdownArrow = styled.div`  
+  position: absolute;  
+  right: 10px;  
+  top: 50%;  
+  transform: translateY(-50%);  
+  cursor: pointer;  
+  color: #999;
+  font-size: 14px;  
+  
+  &:hover {    
+    color: #333;
+  } 
+`;
+
+const ClearButton = styled.button`    
+  position: absolute;    
+  right: 20px;
+  top: 50%;    
+  transform: translateY(-50%);    
+  background: none;    
+  border: none;    
+  padding: 0 5px;    
+  cursor: pointer;    
+  color: #999;    
+  font-size: 16px;    
+  line-height: 1;  
+  
+  &:hover {    
+    color: #333;    
+  }    
 `;
 
 const SelectedOption = styled.div`  
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2px 5px;
-`;  
-  
+`;
+
 const SelectedIcon = styled.img`  
   width: 32px;  
   height: 32px;
   display: block;
-`;  
-  
+`;
+
 
 const Options = styled.ul`
   position: absolute;
@@ -83,17 +149,17 @@ const OptionComponent: FC<I_OptionComponentProps> = ({ icon, label, onMouseDown 
     </Option>
 )
 
-const ComboboxComponent: FC<I_ComboboxComponentProps> = ({  
-    openOnFocus,  
-    options,  
-    onSelectionChange,  
-  }) =>{
+const ComboboxComponent: FC<I_ComboboxComponentProps> = ({
+    openOnFocus,
+    options,
+    onSelectionChange,
+}) => {
 
 
     const [open, setOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState<Asset | null>(null);
     const [text, setText] = useState(selectedOption?.name || '')
-    const [filteredOptions, setFilteredOptions] = useState(options); 
+    const [filteredOptions, setFilteredOptions] = useState(options);
 
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,20 +167,29 @@ const ComboboxComponent: FC<I_ComboboxComponentProps> = ({
         if (!e.target.value) {
             setSelectedOption(null);
             setFilteredOptions(options);
-        } else {  
-            const inputText = e.target.value.toLowerCase(); 
-            const filteredOptions = options.filter(option => 
-                option.name.toLowerCase().includes(inputText)  
-            );  
-      
-            setFilteredOptions(filteredOptions); 
-        }  
+        } else {
+            const inputText = e.target.value.toLowerCase();
+            const filteredOptions = options.filter(option =>
+                option.name.toLowerCase().includes(inputText)
+            );
+
+            setFilteredOptions(filteredOptions);
+        }
     };
 
-    
+    const handleClear = () => {
+        setText('');
+        setSelectedOption(null);
+        setOpen(false);
+    };
+
+    const handleDropdownClick = () => {
+        setOpen(!open);
+    };
 
     const handleSelection = (option: Asset) => {
-        setSelectedOption(option); 
+        setOpen(false);
+        setSelectedOption(option);
         setText(option.name);
         onSelectionChange(option);
     };
@@ -128,19 +203,24 @@ const ComboboxComponent: FC<I_ComboboxComponentProps> = ({
 
     return (
         <Combobox>
-            {selectedOption && (  
-                <SelectedOption>  
-                    <SelectedIcon src={selectedOption.logo_URIs?.png || selectedOption.logo_URIs?.svg} alt="" />   
-                </SelectedOption>  
+            {/* {JSON.stringify(selectedOption)} */}
+            {selectedOption && (
+                <SelectedOption>
+                    <SelectedIcon src={selectedOption.logo_URIs?.png || selectedOption.logo_URIs?.svg} alt="" />
+                </SelectedOption>
             )}
 
-            <Input
-                data-has-selected-option={selectedOption}
-                onFocus={() => openOnFocus && setOpen(true)}
-                onChange={handleInput}
-                onBlur={() => setOpen(false)} 
-                value={text}
-            />
+            <InputContainer>
+                <Input data-has-selected-option={!!selectedOption} onFocus={() => setOpen(true) }>
+                    <input type="text" value={text} onChange={handleInput} />
+                    {text && (
+                        <ClearButton onClick={handleClear}>X</ClearButton> // 当text有值时显示清除按钮  
+                    )}
+                    {!text && (
+                        <DropdownArrow onClick={handleDropdownClick}>▼</DropdownArrow> // 仅在text为空时显示箭头  
+                    )}
+                </Input>
+            </InputContainer>
 
             {open &&
                 <Options>
@@ -153,7 +233,7 @@ const ComboboxComponent: FC<I_ComboboxComponentProps> = ({
                                 key={option.name}
                                 icon={iconUrl}
                                 label={option.name}
-                                onMouseDown={() =>  handleSelection(option)}
+                                onMouseDown={() => handleSelection(option)}
                             />
                         )
                     })}

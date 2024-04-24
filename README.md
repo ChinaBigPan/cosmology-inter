@@ -1,3 +1,12 @@
+## Instruction
+
+- `DataSource` in `ChainListStore` to determine the data source;
+- `selectedChain` value is `ChainType`;
+
+
+--------------------------------
+
+
 This is a Cosmos App project bootstrapped with [`create-cosmos-app`](https://github.com/cosmology-tech/create-cosmos-app).
 
 ## Getting Started
@@ -86,3 +95,4 @@ Checkout these related projects:
 AS DESCRIBED IN THE LICENSES, THE SOFTWARE IS PROVIDED “AS IS”, AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.
 
 No developer or entity involved in creating this software will be liable for any claims or damages whatsoever associated with your use, inability to use, or your interaction with other users of the code, including any direct, indirect, incidental, special, exemplary, punitive or consequential damages, or loss of profits, cryptocurrencies, tokens, or anything else of value.
+
