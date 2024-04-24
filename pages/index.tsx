@@ -1,11 +1,13 @@
 import { Divider } from "@interchain-ui/react";
-import { Layout, Wallet } from "@/components";
+import { Layout, ChainList } from "@/components";
+
 
 export default function Home() {
   return (
-    <Layout>
-      <Wallet />
-      <Divider mb="$16" />
-    </Layout>
+      <Layout>
+        <Divider mt="$16" mb="$16" />
+        <ChainList />
+        <Divider mb="$16" mt="$16" />
+      </Layout>
   );
 }
